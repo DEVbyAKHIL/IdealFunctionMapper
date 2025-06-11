@@ -18,7 +18,7 @@ This project maps training functions to their best-fit ideal functions using the
 ## 📁 Project Structure
 
 python-project/
-├── data/
+├── data/ <br/>
 │ ├── train.csv # Input training data
 │ ├── ideal.csv # Ideal function data
 │ ├── test.csv # Test data
