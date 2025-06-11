@@ -17,17 +17,17 @@ This project maps training functions to their best-fit ideal functions using the
 
 ## 📁 Project Structure
 
-python-project/
+python-project/<br/>
 ├── data/ <br/>
-│ ├── train.csv # Input training data
-│ ├── ideal.csv # Ideal function data
-│ ├── test.csv # Test data
-│ └── data.db # SQLite database (auto-generated)
-├── src/
-│ ├── function_mapper.py # Finds best-fit ideal functions
-│ ├── test_mapper.py # Calculates max deviation
-│ ├── visualize.py # Plots with Bokeh
-│ ├── database.py # Loads CSVs into
+│ ├── train.csv # Input training data<br/>
+│ ├── ideal.csv # Ideal function data<br/>
+│ ├── test.csv # Test data<br/>
+│ └── data.db # SQLite database (auto-generated)<br/>
+├── src/<br/>
+│ ├── function_mapper.py # Finds best-fit ideal functions<br/>
+│ ├── test_mapper.py # Calculates max deviation<br/>
+│ ├── visualize.py # Plots with Bokeh<br/>
+│ ├── database.py # Loads CSVs into<br/>
 
 ## 🚀 How to Run
 
