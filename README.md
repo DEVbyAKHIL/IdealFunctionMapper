@@ -42,7 +42,6 @@ python-project/<br/>
 │ ├── test_mapper.py # Calculates max deviation<br/>
 │ ├── visualize.py # Plots with Bokeh<br/>
 │ ├── database.py # Loads CSVs into<br/>
-│
 ├── tests/<br/>
   └── test_functionmapper.py<br/>
 
