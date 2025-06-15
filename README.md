@@ -76,14 +76,15 @@ python-project/<br/>
 ## 🧑‍💻 Git Workflow 
 
 
-git clone -b develop <repo-url><br/>
-cd <repo-folder><br/>
-git checkout -b my-feature<br/>
+- git clone -b develop -repo-url-<br/>
+- cd -repo-folder-<br/>
+- git checkout -b my-feature<br/>
 
--make changes<br/>
-git add .<br/>
-git commit -m "Added new feature"<br/>
-git push origin my-feature<br/>
+- made changes<br/>
+
+- git add .<br/>
+- git commit -m "Added new feature"<br/>
+- git push origin my-feature<br/>
 
 
 
