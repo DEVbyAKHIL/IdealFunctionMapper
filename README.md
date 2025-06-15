@@ -77,14 +77,14 @@ python-project/<br/>
 ## 🧑‍💻 Git Workflow 
 
 
-git clone -b develop <repo-url>
-cd <repo-folder>
-git checkout -b my-feature
+git clone -b develop <repo-url><br/>
+cd <repo-folder><br/>
+git checkout -b my-feature<br/>
 
-make changes
-git add .
-git commit -m "Added new feature"
-git push origin my-feature
+make changes<br/>
+git add .<br/>
+git commit -m "Added new feature"<br/>
+git push origin my-feature<br/>
 
 
 
@@ -101,11 +101,10 @@ git push origin my-feature
 
 ## 📚 References
 
-- [📄 IU Assignment PDF](Task_WrittenAssignment_DLMDSPWP01.pdf)
-- [📘 IU Course Book](001-2023-0712_DLMDSPWP01_Course_Book.pdf)
-- [🐼 pandas docs](https://pandas.pydata.org/)
-- [🦎 SQLAlchemy docs](https://docs.sqlalchemy.org/)
-- [📈 Bokeh docs](https://docs.bokeh.org/)
+- [📘 IU Course Book]
+- [🐼 pandas docs]
+- [🦎 SQLAlchemy docs]
+- [📈 Bokeh docs]
 
 ---
 
