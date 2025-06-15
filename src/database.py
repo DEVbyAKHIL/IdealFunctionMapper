@@ -1,5 +1,5 @@
 """
-This Handles all the data preparation and database setup
+This Handles all the data preparation and the database setup
 I have put all the data loading and saving here so it will be easy to run it first.
 """
 

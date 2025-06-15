@@ -56,7 +56,7 @@ class IdealDataHandler(DataHandler):
 
 class TestDataHandler(DataHandler):
     """
-    Handles loading and saving of test data.
+    Handles loading and saving of the test data.
     """
     def load(self):
         return self.load_csv("data/test.csv")
