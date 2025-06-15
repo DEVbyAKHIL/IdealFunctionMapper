@@ -80,7 +80,8 @@ git clone -b develop <repo-url><br/>
 cd <repo-folder><br/>
 git checkout -b my-feature<br/>
 
-make changes<br/>
+- made changes
+
 git add .<br/>
 git commit -m "Added new feature"<br/>
 git push origin my-feature<br/>
