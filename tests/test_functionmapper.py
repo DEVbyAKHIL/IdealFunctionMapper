@@ -1,47 +1,41 @@
+"""
+Unit tests for testing function and test mapping logic
+I have added a simple code for unittesting because I'm still learning unittest, but I have tried to test the main logic
+"""
+
 import unittest
-import pandas as pd
-import numpy as np
-from sqlalchemy import create_engine
-from src.function_mapper import find_best_fit_functions
-from src.database import load_all_data
-from src.test_mapper import calculate_max_deviation
+from src.function_mapper import FunctionMapper
+from src.test_mapper import TestMapper
 
 class TestFunctionMapping(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
-        cls.engine = create_engine("sqlite:///data/data.db")
-        cls.train_df, cls.ideal_df, cls.test_df, cls.engine = load_all_data()
+        cls.func_mapper = FunctionMapper()
+        cls.test_mapper = TestMapper()
+        cls.train, cls.ideal = cls.func_mapper.load_data()
+        cls.mapping = cls.func_mapper.find_best_fit_functions(cls.train, cls.ideal)
 
-    def test_find_best_fit_functions_returns_dict(self):
-        result = find_best_fit_functions(self.train_df, self.ideal_df)
-        print("Best fit result:", result)  # Add this line for debugging
-        self.assertIsInstance(result, dict)
-        self.assertTrue(all(key.startswith("y") for key in result.keys()))
-        self.assertTrue(all(value.startswith("y") for value in result.values()))
+    def test_find_best_fit_functions(self):
+        mapping = self.func_mapper.find_best_fit_functions(self.train, self.ideal)
+        self.assertIsInstance(mapping, dict)
+        self.assertTrue(all(isinstance(k, str) for k in mapping.keys()))
+        self.assertTrue(all(isinstance(v, str) for v in mapping.values()))
+        # I added this lines, to check that all four training functions are mapped
+        self.assertEqual(len(mapping), 4)
 
-    def test_calculate_max_deviation_structure(self):
-        best_fits = {
-            'y1': 'y42',
-            'y2': 'y41',
-            'y3': 'y43',
-            'y4': 'y48'
-        }
-        max_dev = calculate_max_deviation(self.train_df, self.ideal_df, best_fits)
-        self.assertIsInstance(max_dev, dict)
-        self.assertEqual(set(max_dev.keys()), set(best_fits.values()))
+    def test_max_deviation(self):
+        devs = self.test_mapper.max_deviation(self.train, self.ideal, self.mapping)
+        self.assertIsInstance(devs, dict)
+        for v in devs.values():
+            self.assertIsInstance(v, float)
+            self.assertGreaterEqual(v, 0.0)
 
-    def test_calculate_max_deviation_values(self):
-        best_fits = {
-            'y1': 'y42',
-            'y2': 'y41',
-            'y3': 'y43',
-            'y4': 'y48'
-        }
-        max_dev = calculate_max_deviation(self.train_df, self.ideal_df, best_fits)
-        for value in max_dev.values():
-            self.assertIsInstance(value, float)
-            self.assertGreaterEqual(value, 0.0)
+    def test_error_on_missing_file(self):
+        # This is a negative test: try loading a file that doesn't exist
+        from src.data_handler import DataLoadError, DataHandler
+        handler = DataHandler(db_path="data/data.db")
+        with self.assertRaises(DataLoadError):
+            handler.load_csv("data/does_not_exist.csv")
 
 if __name__ == "__main__":
     unittest.main()

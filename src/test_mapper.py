@@ -1,81 +1,78 @@
-import pandas as pd
+"""
+Assigns the test data points to the closest ideal function if it's within allowed deviation
+This is where I check if a test point "fits" one of the chosen ideal functions
+"""
+
 import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 
-def load_data():
-    """Load all necessary datasets from SQLite database."""
-    engine = create_engine("sqlite:///data/data.db")
-    train_df = pd.read_sql("SELECT * FROM training_data", engine)
-    ideal_df = pd.read_sql("SELECT * FROM ideal_functions", engine)
-    test_df = pd.read_sql("SELECT * FROM test_data", engine)
+class TestMapper:
+    """
+    Allocates test points to ideal functions using deviation thresholds.
+    """
+    def __init__(self, db_path="data/data.db"):
+        self.engine = create_engine(f"sqlite:///{db_path}")
 
-    # Normalize column names to lowercase for consistency
-    test_df.columns = test_df.columns.str.lower()
+    def load_data(self):
+        """
+        Loads training, ideal & test data from the database
+        """
+        train = pd.read_sql("SELECT * FROM training_data", self.engine)
+        ideal = pd.read_sql("SELECT * FROM ideal_functions", self.engine)
+        test = pd.read_sql("SELECT * FROM test_data", self.engine)
+        test.columns = test.columns.str.lower()
+        return train, ideal, test
 
-    return train_df, ideal_df, test_df, engine
+    def max_deviation(self, train, ideal, mapping):
+        """
+        It Calculates the max deviation for each mapped pair.
+        """
+        dev = {}
+        for t, i in mapping.items():
+            dev[i] = np.abs(train[t] - ideal[i]).max()
+        return dev
 
-def calculate_max_deviation(train_df, ideal_df, mapping):
-    """Calculate the max deviation for each best-fit ideal function."""
-    max_deviation = {}
-    for train_col, ideal_col in mapping.items():
-        deviation = np.abs(train_df[train_col] - ideal_df[ideal_col])
-        max_deviation[ideal_col] = deviation.max()
-    return max_deviation
+    def map_test_points(self, test, ideal, mapping, devs):
+        """
+        Maps each test point to an ideal function if it fits the allowed deviation.
+        """
+        rows = []
+        for _, row in test.iterrows():
+            x, y = row["x"], row["y"]
+            found = False
+            for ic in mapping.values():
+                ideal_row = ideal[ideal["x"] == x]
+                if ideal_row.empty:
+                    continue
+                yid = ideal_row[ic].values[0]
+                d = abs(y - yid)
+                if d <= devs[ic] * np.sqrt(2):
+                    rows.append({"X": x, "Y": y, "Delta_Y": d, "Ideal_Function": ic})
+                    found = True
+                    break
+            if not found:
+                # I added this, if any test points are not matching (for debugging)
+                # print(f"Test point ({x}, {y}) did not matched any ideal function.")
+                pass
+        return pd.DataFrame(rows)
 
-def map_test_data(test_df, ideal_df, best_fit_mapping, max_deviation, engine):
-    result_rows = []
-    selected_ideal_cols = list(best_fit_mapping.values())
-
-    for index, row in test_df.iterrows():
-        x, y_test = row['x'], row['y']
-        matched = False  # Track if this row matched any ideal function
-
-        for ideal_col in selected_ideal_cols:
-            y_ideal_row = ideal_df[ideal_df['x'] == x]
-
-            if y_ideal_row.empty:
-                continue  # x not found in ideal function
-
-            y_ideal = y_ideal_row[ideal_col].values[0]
-            delta_y = abs(y_test - y_ideal)
-            threshold = max_deviation[ideal_col] * np.sqrt(2)
-
-            print(f"[DEBUG] Test X: {x:.2f}, Y_test: {y_test:.2f}, Y_ideal ({ideal_col}): {y_ideal:.2f}, ΔY: {delta_y:.4f}, Threshold: {threshold:.4f}")
-
-            if delta_y <= threshold:
-                result_rows.append({
-                    'X': x,
-                    'Y': y_test,
-                    'Delta_Y': delta_y,
-                    'Ideal_Function': ideal_col
-                })
-                matched = True
-                break  # Stop after first match
-
-        if not matched:
-            print(f"[INFO] No match found for test point (X={x}, Y={y_test})")
-
-    result_df = pd.DataFrame(result_rows)
-
-    if not result_df.empty:
-        result_df.to_sql("test_mapping", engine, if_exists="replace", index=False)
-        print(f"[SUCCESS] Stored {len(result_df)} matched test points in the database.")
-    else:
-        print("[WARNING] No test data points matched any ideal function.")
-
-def main():
-    train_df, ideal_df, test_df, engine = load_data()
-
-    # Your mappings from function_mapper.py (manually copied)
-    best_fit_mapping = {
-        'y1': 'y42',
-        'y2': 'y41',
-        'y3': 'x',
-        'y4': 'y48'
-    }
-
-    max_deviation = calculate_max_deviation(train_df, ideal_df, best_fit_mapping)
-    map_test_data(test_df, ideal_df, best_fit_mapping, max_deviation, engine)
+    def save_results(self, df):
+        """
+        Saves the mapped test points to the database.
+        """
+        if not df.empty:
+            df.to_sql("test_mapping", self.engine, if_exists="replace", index=False)
+            print("Saved test_mapping table to DB.")
+        else:
+            print("No matches found for test data.")
 
 if __name__ == "__main__":
-    main()
+    test_mapper = TestMapper()
+    train, ideal, test = test_mapper.load_data()
+    # For a demo, I use the real mapping. In practice, this should come from FunctionMapper.
+    from src.function_mapper import FunctionMapper
+    mapping = FunctionMapper().find_best_fit_functions(train, ideal)
+    devs = test_mapper.max_deviation(train, ideal, mapping)
+    result_df = test_mapper.map_test_points(test, ideal, mapping, devs)
+    test_mapper.save_results(result_df)

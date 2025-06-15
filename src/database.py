@@ -1,49 +1,35 @@
-import os
-import pandas as pd
-from sqlalchemy import create_engine
+"""
+This Handles all the data preparation and database setup
+I have put all the data loading and saving here so it will be easy to run it first.
+"""
 
-def load_all_data():
-    """Load training, ideal, test data, and engine — for full use in main + testing."""
-    engine = create_engine("sqlite:///data/data.db")
-    train_df = pd.read_sql("SELECT * FROM training_data", engine)
-    ideal_df = pd.read_sql("SELECT * FROM ideal_functions", engine)
-    test_df = pd.read_sql("SELECT * FROM test_data", engine)
-    return train_df, ideal_df, test_df, engine
+from .data_handler import TrainingDataHandler, IdealDataHandler, TestDataHandler, DataLoadError
 
-def load_csv_to_df(file_path):
-    """Loads a CSV file into a pandas DataFrame."""
+def prepare_database():
+    """
+    Loads all the CSV files and saves them into the SQLite database
+    """
+    train_handler = TrainingDataHandler()
+    ideal_handler = IdealDataHandler()
+    test_handler = TestDataHandler()
+
     try:
-        df = pd.read_csv(file_path)
-        print(f"Loaded {file_path} successfully.")
-        return df
-    except Exception as e:
-        print(f"Error loading {file_path}: {e}")
-        return None
+        train_df = train_handler.load()
+        train_handler.save_to_db(train_df, "training_data")
+    except DataLoadError as e:
+        print(f"Error in loading the training data: {e}")
 
-def store_df_to_sqlite(df, table_name, db_path='data/data.db'):
-    """Stores a DataFrame into a SQLite database."""
     try:
-        engine = create_engine(f"sqlite:///{db_path}")
-        df.to_sql(table_name, engine, if_exists='replace', index=False)
-        print(f"Stored {table_name} in {db_path}.")
-    except Exception as e:
-        print(f"Error storing {table_name}: {e}")
+        ideal_df = ideal_handler.load()
+        ideal_handler.save_to_db(ideal_df, "ideal_functions")
+    except DataLoadError as e:
+        print(f"Error in loading ideal data: {e}")
 
-def process_all_files():
-    """Loads and stores all 3 CSVs into SQLite database."""
-    base_path = "data"
-
-    train_df = load_csv_to_df(os.path.join(base_path, "train.csv"))
-    if train_df is not None:
-        store_df_to_sqlite(train_df, "training_data")
-
-    ideal_df = load_csv_to_df(os.path.join(base_path, "ideal.csv"))
-    if ideal_df is not None:
-        store_df_to_sqlite(ideal_df, "ideal_functions")
-
-    test_df = load_csv_to_df(os.path.join(base_path, "test.csv"))
-    if test_df is not None:
-        store_df_to_sqlite(test_df, "test_data")
+    try:
+        test_df = test_handler.load()
+        test_handler.save_to_db(test_df, "test_data")
+    except DataLoadError as e:
+        print(f"Error in loading test data: {e}")
 
 if __name__ == "__main__":
-    process_all_files()
+    prepare_database()

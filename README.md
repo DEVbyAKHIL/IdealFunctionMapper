@@ -13,6 +13,19 @@ This project maps training functions to their best-fit ideal functions using the
 - SQLite
 - unittest (for testing)
 
+## ✨ Features
+
+- 📥 **Loads training, ideal, and test data from CSV files**
+- 🗄️ **Stores all data in a SQLite database with SQLAlchemy**
+- 🧮 **Selects four ideal functions using least squares minimization**
+- 🧩 **Maps test data to ideal functions if within allowed deviation**
+- 📊 **Visualizes results using Bokeh (interactive HTML plot!)**
+- 🏗️ **Object-oriented design with inheritance**
+- 🚨 **Standard and custom exception handling**
+- 🧪 **Unit tests for all main logic**
+- 📝 **Fully documented with docstrings and comments**
+
+
 ## 📁 Project Structure
 
 python-project/<br/>
@@ -22,10 +35,16 @@ python-project/<br/>
 │ ├── test.csv # Test data<br/>
 │ └── data.db # SQLite database (auto-generated)<br/>
 ├── src/<br/>
+│ ├── init.py<br/>
+│ ├── data_handler.py<br/>
+│ ├── exceptions.py<br/>
 │ ├── function_mapper.py # Finds best-fit ideal functions<br/>
 │ ├── test_mapper.py # Calculates max deviation<br/>
 │ ├── visualize.py # Plots with Bokeh<br/>
 │ ├── database.py # Loads CSVs into<br/>
+│
+├── tests/<br/>
+  └── test_functionmapper.py<br/>
 
 ## 🚀 How to Run
 
@@ -36,15 +55,59 @@ python-project/<br/>
     "pip install -r requirements.txt"
 
 3. Load CSVs into SQLite:
-     "python src/database.py"
+     "python -m src.database"
    
 5. Run main logic:
-   "python src/function_mapper.py"
+   "python -m src.function_mapper"
 
-6. Visualize
-   "python src/visualize.py"
+6. Map test data to ideal functions
+    "python -m src.test_mapper"
 
-7.  Run all tests
+7. Visualize
+   "python -m src.visualize"
+
+8.  Run all tests
     "python -m unittest discover -s tests"
 
+
+
+
+---
+
+## 🧑‍💻 Git Workflow 
+
+
+git clone -b develop <repo-url>
+cd <repo-folder>
+git checkout -b my-feature
+
+make changes
+git add .
+git commit -m "Added new feature"
+git push origin my-feature
+
+
+
+---
+
+## 💡 Notes & Tips
+
+- All code is my own work, inspired by the IU course book and examples.
+- The project is designed for clarity and learning, with personal comments and explanations.
+- Input data files (`train.csv`, `ideal.csv`, `test.csv`) are **not included**
+- The full source code is included in the appendix of my written assignment.
+
+---
+
+## 📚 References
+
+- [📄 IU Assignment PDF](Task_WrittenAssignment_DLMDSPWP01.pdf)
+- [📘 IU Course Book](001-2023-0712_DLMDSPWP01_Course_Book.pdf)
+- [🐼 pandas docs](https://pandas.pydata.org/)
+- [🦎 SQLAlchemy docs](https://docs.sqlalchemy.org/)
+- [📈 Bokeh docs](https://docs.bokeh.org/)
+
+---
+
+## 🙏 Thank you for checking out my project!
 
