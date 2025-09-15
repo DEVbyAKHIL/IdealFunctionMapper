@@ -1,3 +1,11 @@
+
+"""
+This main.py brings together database setup, function mapping, test data assignment,
+output saving, and visualization in one integrated workflow. The Main components are
+modularized: data handling, analysis, and visualization can be easily modified and extended later.
+"""
+
+
 from src.database import prepare_database
 from src.function_mapper import FunctionMapper
 from src.test_mapper import TestMapper
