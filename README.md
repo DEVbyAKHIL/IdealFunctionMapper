@@ -78,13 +78,13 @@ python-project/<br/>
 
 - git clone -b develop -repo-url-<br/>
 - cd -repo-folder-<br/>
-- git checkout -b my-feature<br/>
+- git checkout -b feature<br/>
 
 - made changes<br/>
 
 - git add .<br/>
 - git commit -m "Added new feature"<br/>
-- git push origin my-feature<br/>
+- git push origin feature<br/>
 
 
 
