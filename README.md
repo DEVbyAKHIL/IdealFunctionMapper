@@ -76,8 +76,8 @@ python-project/<br/>
 ## 🧑‍💻 Git Workflow Task
 
 
-git clone -b develop <repo-url><br/>
-cd <repo-folder><br/>
+git clone -b develop repo-url<br/>
+cd repo-path<br/>
 git checkout -b my-feature<br/>
 
 - made changes
