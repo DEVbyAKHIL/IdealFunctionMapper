@@ -420,3 +420,116 @@ chosen, mapped_df, train_df, ideal_df, test_df = run_pipeline(cfg)
 
 
 mapped_df.head(10)
+
+
+
+
+viz = Visualizer(train_df, ideal_df, chosen, mapped_df)
+viz.build("all_6_graphs.html")
+print(" Saved all_6_graphs.html")
+
+# ------------------------------------------------
+UNIT TESTS
+#-------------------------------------------------
+
+chosen, mapped_df, train_df, ideal_df, test_df = run_pipeline(cfg)
+
+import unittest
+import math
+import os
+import numpy as np
+import pandas as pd
+from sqlalchemy import create_engine, inspect
+
+class TestIUAssignment(unittest.TestCase):
+
+    # -------------------------
+    # 1) Math Function Tests
+    # -------------------------
+    def test_sse(self):
+        y1 = np.array([1.0, 2.0, 3.0])
+        y2 = np.array([1.0, 2.0, 4.0])
+        self.assertAlmostEqual(compute_sse(y1, y2), 1.0)
+
+    def test_max_abs_dev(self):
+        y1 = np.array([1.0, 2.0, 3.0])
+        y2 = np.array([0.0, 2.5, 2.0])
+        self.assertAlmostEqual(compute_max_abs_dev(y1, y2), 1.0)
+
+    def test_threshold_formula(self):
+        max_dev = 2.0
+        threshold = max_dev * math.sqrt(2)
+        self.assertTrue(2.82 <= threshold <= 2.83)
+
+    # -------------------------
+    # 2) Chosen Ideal Checks
+    # -------------------------
+    def test_chosen_has_four(self):
+        self.assertEqual(set(chosen.keys()), {"y1","y2","y3","y4"})
+
+    def test_ideal_index_range(self):
+        for k,v in chosen.items():
+            self.assertTrue(1 <= int(v["ideal_index"]) <= 50)
+
+    # -------------------------
+    # 3) Database Tests
+    # -------------------------
+    def test_db_exists(self):
+        self.assertTrue(os.path.exists("assignment.db"))
+
+    def test_required_tables_exist(self):
+        engine = create_engine("sqlite:///assignment.db")
+        inspector = inspect(engine)
+        tables = inspector.get_table_names()
+
+        self.assertIn("training_data", tables)
+        self.assertIn("ideal_functions", tables)
+        self.assertIn("mapped_test_data", tables)
+
+    def test_training_columns(self):
+        engine = create_engine("sqlite:///assignment.db")
+        df = pd.read_sql_table("training_data", engine)
+        self.assertEqual(list(df.columns), ["x","y1","y2","y3","y4"])
+
+    def test_ideal_columns(self):
+        engine = create_engine("sqlite:///assignment.db")
+        df = pd.read_sql_table("ideal_functions", engine)
+        expected = ["x"] + [f"y{i}" for i in range(1,51)]
+        self.assertEqual(list(df.columns), expected)
+
+    def test_mapped_columns(self):
+        engine = create_engine("sqlite:///assignment.db")
+        df = pd.read_sql_table("mapped_test_data", engine)
+        self.assertEqual(list(df.columns), ["x","y","delta_y","ideal_func_no"])
+
+    # -------------------------
+    # 4) Mapping Rule Check
+    # -------------------------
+    def test_mapping_rule_respected(self):
+        sqrt2 = math.sqrt(2)
+
+        assigned = mapped_df.dropna(subset=["ideal_func_no","delta_y"])
+
+        ideal_to_maxdev = {
+            int(v["ideal_index"]): float(v["max_dev"])
+            for v in chosen.values()
+        }
+
+        for _, row in assigned.iterrows():
+            ideal_no = int(row["ideal_func_no"])
+            delta = float(row["delta_y"])
+            threshold = ideal_to_maxdev[ideal_no] * sqrt2
+
+            self.assertLessEqual(delta, threshold + 1e-9)
+
+# Run tests
+unittest.main(argv=[''], exit=False)
+
+# -------------------------------------------------------------------------
+
+from google.colab import files
+files.download("assignment.db")
+files.download("visualization.html")
+
+
+
