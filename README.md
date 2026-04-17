@@ -182,8 +182,4 @@ IU International University of Applied Sciences
 
 ---
 
-## 📅 Submission Date
-
-31-03-2026
-
 ---
