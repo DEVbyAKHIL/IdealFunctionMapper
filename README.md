@@ -1,112 +1,189 @@
+# 📊 Ideal Function Mapper (Colab Implementation)
 
-# Python Function Mapping Project – DLMDSPWP01
+## 📌 Project Overview
+
+This project implements a **data analysis pipeline in Python using Google Colab** to:
+
+* Select best-fit ideal functions from a dataset of 50 functions
+* Compare them with training datasets
+* Map test data points using a deviation-based rule
+* Store results in a database
+* Visualize outputs using plots
+
+The entire implementation is contained in a **single Jupyter Notebook (`main.ipynb`)**.
+
+---
 
 ## 🎯 Objective
-This project maps training functions to their best-fit ideal functions using the **least squares method**. It evaluates new test data against these mappings, identifies the best matches, and stores everything in a **SQLite database**. Visual results are rendered using **Bokeh**.
 
-## 🔧 Tech Stack
+The objective of this project is to:
 
-- Python 3.11
-- pandas
-- SQLAlchemy
-- Bokeh
-- SQLite
-- unittest (for testing)
+* Identify **4 ideal functions** that best fit the training data using **Sum of Squared Errors (SSE)**
+* Assign test data points using a **√2 deviation threshold**
+* Ensure reliable and consistent mapping of new data points
 
-## ✨ Features
+---
 
-- 📥 **Loads training, ideal, and test data from CSV files**
-- 🗄️ **Stores all data in a SQLite database with SQLAlchemy**
-- 🧮 **Selects four ideal functions using least squares minimization**
-- 🧩 **Maps test data to ideal functions if within allowed deviation**
-- 📊 **Visualizes results using Bokeh (interactive HTML plot!)**
-- 🏗️ **Object-oriented design with inheritance**
-- 🚨 **Standard and custom exception handling**
-- 🧪 **Unit tests for all main logic**
-- 📝 **Fully documented with docstrings and comments**
+## 🗂️ Project Structure
 
+```
+IdealFunctionMapper/
+│
+├── data/
+│   ├── train.csv
+│   ├── ideal.csv
+│   └── test.csv
+│
+├── src/
+│   └── main.ipynb
 
-## 📁 Project Structure
+```
 
-python-project/<br/>
-├── data/ <br/>
-│ ├── train.csv # Input training data<br/>
-│ ├── ideal.csv # Ideal function data<br/>
-│ ├── test.csv # Test data<br/>
-│ └── data.db # SQLite database (auto-generated)<br/>
-├── src/<br/>
-│ ├── init.py<br/>
-│ ├── data_handler.py<br/>
-│ ├── exceptions.py<br/>
-│ ├── function_mapper.py # Finds best-fit ideal functions<br/>
-│ ├── test_mapper.py # Calculates max deviation<br/>
-│ ├── visualize.py # Plots with Bokeh<br/>
-│ ├── database.py # Loads CSVs into<br/>
-├── tests/<br/>
-  └── test_functionmapper.py<br/>
+---
+
+## ⚙️ Technologies Used
+
+* **Python 3**
+* **Pandas**
+* **NumPy**
+* **SQLAlchemy**
+* **SQLite**
+* **Bokeh**
+* **Google Colab / Jupyter Notebook**
+
+---
+
+## 🔄 Workflow
+
+### 1. Data Loading
+
+* Load CSV files (`train.csv`, `ideal.csv`, `test.csv`)
+* Convert into Pandas DataFrames
+
+### 2. Data Preprocessing
+
+* Handle missing values
+* Ensure consistent numeric types
+* Align X values
+
+### 3. Ideal Function Selection
+
+* Compute **SSE (Sum of Squared Errors)**
+* Select the best-fit ideal function for each training dataset
+
+### 4. Deviation Calculation
+
+* Compute deviation:
+
+  ```
+  Δy = |y_test - y_ideal|
+  ```
+
+### 5. Mapping Rule
+
+* Assign test points only if:
+
+  ```
+  Δy ≤ max_deviation × √2
+  ```
+
+### 6. Database Storage
+
+* Store results in **SQLite database**
+* Includes:
+
+  * Training data
+  * Ideal functions
+  * Mapping results
+
+### 7. Visualization
+
+* Training data plots
+* Ideal function plots
+* Comparison plots
+* Test data mapping results
+
+---
+
+## 🧪 Unit Testing
+
+Basic unit tests are implemented inside the notebook to verify:
+
+* SSE calculation
+* Maximum deviation
+* √2 threshold rule
+* Ideal function selection
+* Database creation
+* Mapping correctness
+
+---
 
 ## 🚀 How to Run
 
-1. Activate virtual environment:
-    ".\venv\Scripts\activate"
+### ▶️ Option 1: Google Colab (Recommended)
 
-2. Install requirements:
-    "pip install -r requirements.txt"
-
-3. Load CSVs into SQLite:
-     "python -m src.database"
-   
-5. Run main logic:
-   "python -m src.function_mapper"
-
-6. Map test data to ideal functions
-    "python -m src.test_mapper"
-
-7. Visualize
-   "python -m src.visualize"
-
-8.  Run all tests
-    "python -m unittest discover -s tests"
-
-
-
+1. Open `main.ipynb` in Google Colab
+2. Upload the dataset files (`train.csv`, `ideal.csv`, `test.csv`)
+3. Run all cells sequentially
 
 ---
 
-## 🧑‍💻 Git Workflow Task
+### 💻 Option 2: Local Jupyter Notebook
 
+```bash
+pip install pandas numpy sqlalchemy bokeh
+jupyter notebook
+```
 
-- git clone -b develop -repo-url-<br/>
-- cd -repo-folder-<br/>
-- git checkout -b feature<br/>
+Open:
 
-- made changes<br/>
-
-- git add .<br/>
-- git commit -m "Added new feature"<br/>
-- git push origin feature<br/>
-
-
+```
+src/main.ipynb
+```
 
 ---
 
-## 💡 Notes & Tips
+## 📊 Outputs
 
-- All code is my own work, inspired by the IU course book and examples.
-- The project is designed for clarity and learning, with personal comments and explanations.
-- Input data files (`train.csv`, `ideal.csv`, `test.csv`) are **not included**
-- The full source code is included in the appendix of my written assignment.
+The notebook generates:
 
----
-
-## 📚 References
-
-- [📘 IU Course Book]
-- [🐼 pandas docs]
-- [🦎 SQLAlchemy docs]
-- [📈 Bokeh docs]
+* Function comparison plots
+* Scatter plots of test data
+* Assigned vs unassigned data points
+* SQLite database (`database.db`)
 
 ---
 
-## 🙏 Thank you for checking out my project!
+## 📌 Key Concepts
 
+* Least Squares Method (SSE)
+* Deviation-based mapping
+* Data preprocessing
+* Database integration
+* Data visualization
+
+---
+
+## 📖 Future Improvements
+
+* Add advanced regression models
+* Improve outlier handling
+* Introduce adaptive thresholds
+* Enhance visualization interactivity
+
+---
+
+## 👤 Author
+
+**Akhil Thoppil Shabu**
+Matriculation Number: 4250982
+
+IU International University of Applied Sciences
+
+---
+
+## 📅 Submission Date
+
+31-03-2026
+
+---
